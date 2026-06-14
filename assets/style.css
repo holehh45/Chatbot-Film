@@ -1,0 +1,26 @@
+.stApp {
+    background-color: #0f172a;
+}
+
+.main {
+    background-color: #0f172a;
+}
+
+.hero-card {
+    background: linear-gradient(
+        135deg,
+        #1e293b,
+        #334155
+    );
+
+    padding: 30px;
+    border-radius: 20px;
+    color: white;
+}
+
+.movie-card {
+    background: #1e293b;
+    border-radius: 15px;
+    padding: 15px;
+    margin-bottom: 15px;
+}
