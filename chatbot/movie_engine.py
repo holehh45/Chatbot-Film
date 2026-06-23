@@ -1,79 +1,89 @@
 import pandas as pd
 
-from chatbot.tmdb_service import TMDBService
-
 class MovieEngine:
-    def __init__(self):
 
-        self.tmdb = TMDBService()
+    def __init__(self):
 
         self.movies = pd.read_csv(
             "data/movies.csv"
         )
 
-# ==================================
-# GET ALL MOVIES
-# ==================================
+        self.movies.fillna(
+            "",
+            inplace=True
+        )
+
+    # get all movies
 
     def get_all_movies(self):
 
-        return self.movies
+        return (
+            self.movies
+            .to_dict("records")
+        )
 
-# ==================================
-# GET MOVIES BY GENRE
-# ==================================
+    # movies by genre
 
     def get_movies_by_genre(
         self,
-        genre
+        genre,
+        limit=10
     ):
 
         result = self.movies[
+
             self.movies["genre"]
+            .astype(str)
             .str.lower()
-            ==
-            genre.lower()
+            .str.contains(
+                genre.lower(),
+                na=False
+            )
         ]
 
-        return result
+        return (
+            result
+            .head(limit)
+            .to_dict("records")
+        )
 
-# ==================================
-# GET MOVIE BY TITLE
-# ==================================
+    # get movie by title
 
-    def get_movie(
+    def get_movie_by_title(
         self,
         title
     ):
 
         result = self.movies[
+
             self.movies["title"]
+            .astype(str)
             .str.lower()
             ==
             title.lower()
         ]
 
-        if len(result) > 0:
+        if len(result) == 0:
 
-            return (
-                result
-                .iloc[0]
-                .to_dict()
-            )
+            return None
 
-        return None
+        return (
+            result
+            .iloc[0]
+            .to_dict()
+        )
 
-# ==================================
-# SEARCH MOVIE
-# ==================================
+    # find best match movie by keyword
 
-    def search_movie(
+    def find_best_match(
         self,
         keyword
     ):
 
         result = self.movies[
+
             self.movies["title"]
+            .astype(str)
             .str.lower()
             .str.contains(
                 keyword.lower(),
@@ -81,37 +91,77 @@ class MovieEngine:
             )
         ]
 
-        return result
+        if len(result) == 0:
 
-# ==================================
-# SIMILAR MOVIES
-# ==================================
+            return None
+
+        return (
+            result
+            .iloc[0]
+            .to_dict()
+        )
+
+    # search movies by keyword
+
+    def search_movie(
+        self,
+        keyword,
+        limit=10
+    ):
+
+        result = self.movies[
+
+            self.movies["title"]
+            .astype(str)
+            .str.lower()
+            .str.contains(
+                keyword.lower(),
+                na=False
+            )
+        ]
+
+        return (
+            result
+            .head(limit)
+            .to_dict("records")
+        )
+
+    # similar movies by genre
 
     def get_similar_movies(
         self,
         genre,
-        current_title
+        current_title,
+        limit=5
     ):
 
         result = self.movies[
+
             (
                 self.movies["genre"]
+                .astype(str)
                 .str.lower()
-                ==
-                genre.lower()
+                .str.contains(
+                    genre.lower(),
+                    na=False
+                )
             )
             &
             (
                 self.movies["title"]
-                != current_title
+                .str.lower()
+                !=
+                current_title.lower()
             )
         ]
 
-        return result.head(4)
+        return (
+            result
+            .head(limit)
+            .to_dict("records")
+        )
 
-# ==================================
-# TOP RATED MOVIES
-# ==================================
+    # top rated movies
 
     def get_top_rated_movies(
         self,
@@ -119,19 +169,23 @@ class MovieEngine:
     ):
 
         result = (
+
             self.movies
+
             .sort_values(
                 by="rating",
                 ascending=False
             )
+
             .head(limit)
         )
 
-        return result
+        return (
+            result
+            .to_dict("records")
+        )
 
-# ==================================
-# RANDOM MOVIE
-# ==================================
+    # random movie
 
     def get_random_movie(self):
 
@@ -140,95 +194,55 @@ class MovieEngine:
             return None
 
         return (
+
             self.movies
+
             .sample(1)
+
             .iloc[0]
+
             .to_dict()
         )
 
-# ==================================
-# TMDB DATA
-# ==================================
-
-    def get_movie_with_tmdb(
-        self,
-        title
-    ):
-
-        try:
-
-            movie = (
-                self.tmdb.search_movie(
-                    title
-                )
-            )
-
-            if movie is None:
-
-                return None
-
-            poster = None
-
-            if movie.get(
-                "poster_path"
-            ):
-
-                poster = (
-                    "https://image.tmdb.org/t/p/w500"
-                    +
-                    movie["poster_path"]
-                )
-
-            return {
-
-                "title":
-                    movie.get(
-                        "title",
-                        title
-                    ),
-
-                "overview":
-                    movie.get(
-                        "overview",
-                        ""
-                    ),
-
-                "rating":
-                    movie.get(
-                        "vote_average",
-                        0
-                    ),
-
-                "poster":
-                    poster
-            }
-
-        except Exception as e:
-
-            print(e)
-
-            return None
-
-# ==================================
-# MOVIE STATISTICS
-# ==================================
+    # statistics
 
     def get_statistics(self):
 
         return {
 
             "total_movies":
+
                 len(
                     self.movies
                 ),
 
             "total_genres":
+
                 self.movies[
                     "genre"
                 ].nunique(),
 
             "highest_rating":
-                self.movies[
-                    "rating"
-                ].max()
+
+                float(
+
+                    self.movies[
+                        "rating"
+                    ].max()
+                ),
+
+            "average_rating":
+
+                round(
+
+                    float(
+
+                        self.movies[
+                            "rating"
+                        ].mean()
+
+                    ),
+
+                    2
+                )
         }
