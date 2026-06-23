@@ -2,58 +2,136 @@ import streamlit as st
 import pandas as pd
 
 st.set_page_config(
-    page_title="Rekomendasi Film",
-    page_icon="🎥"
+page_title="Movie Library",
+page_icon="🎬",
+layout="wide"
 )
 
-st.title("🎥 Daftar Film")
+# header
 
-if st.button("⬅ Kembali ke Dashboard"):
-    st.switch_page("app.py")
-
-movies = pd.read_csv("data/movies.csv")
-
-genre = st.selectbox(
-    "Pilih Genre",
-    sorted(movies["genre"].unique())
+st.header(
+"🎬 Movie Library",
+divider="rainbow"
 )
 
-filtered = movies[
-    movies["genre"] == genre
-]
+col1, col2 = st.columns([8, 1])
 
-for _, movie in filtered.iterrows():
+with col2:
+    if st.button(
+"🏠 Dashboard",
+width="stretch"
+):
+        st.switch_page("app.py")
 
-    with st.container(border=True):
+# load data
 
-        col1, col2 = st.columns([1, 3])
+movies = pd.read_csv(
+"data/movies.csv"
+)
 
-        with col1:
+# FILTER
+
+left, right = st.columns([2, 6])
+
+with left:
+
+    genre = st.selectbox(
+        "🎭 Genre",
+        ["Semua"]
+        +
+        sorted(
+            movies["genre"]
+            .unique()
+        )
+    )
+
+
+with right:
+
+    search = st.text_input(
+        "🔍 Cari Film"
+    )
+
+# filtert data
+
+filtered = movies.copy()
+
+if genre != "Semua":
+
+    filtered = filtered[
+        filtered["genre"] == genre
+    ]
+
+if search:
+
+
+    filtered = filtered[
+        filtered["title"]
+        .str.contains(
+            search,
+            case=False
+        )
+    ]
+
+# info
+
+st.caption(
+f"Menampilkan {len(filtered)} film"
+)
+
+st.divider()
+
+# movie grid
+
+cols = st.columns(4)
+
+for idx, (_, movie) in enumerate(
+filtered.iterrows()
+):
+
+    with cols[idx % 4]:
+
+        with st.container(
+        border=True
+    ):
 
             st.image(
                 movie["poster"],
                 width="stretch"
             )
 
-        with col2:
+            st.markdown(
+                f"### {movie['title']}"
+            )
 
-            st.subheader(movie["title"])
-
-            st.write(
+            st.caption(
                 f"🎭 {movie['genre']}"
             )
 
-            st.write(
-                f"⭐ {movie['rating']}"
+        c1, c2 = st.columns(2)
+
+        with c1:
+            st.metric(
+                "⭐ Rating",
+                movie["rating"]
             )
 
-            st.write(
-                f"📅 {movie['year']}"
+        with c2:
+            st.metric(
+                "📅 Tahun",
+                movie["year"]
             )
 
-            if st.button(
-                f"Detail {movie['title']}",
-                key=movie["title"],
-                width="stretch"
-            ):
-                st.session_state.selected_movie = movie["title"]
+        if st.button(
+            "🎬 Detail",
+            key=f"detail_{idx}",
+            width="stretch"
+        ):
+
+            st.session_state.selected_movie = (
+                movie["title"]
+            )
+
+            st.switch_page(
+                "pages/chatbot.py"
+            )
