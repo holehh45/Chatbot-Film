@@ -19,24 +19,18 @@ def load_css():
 
 load_css()
 
-# ==========================
-# DATASET
-# ==========================
+# dataset
 
 movies = pd.read_csv("data/movies.csv")
 
-# ==========================
-# HERO SECTION
-# ==========================
-
-
+# hero section
 
 st.markdown("""
 <div class='hero-card'>
 
 # 🎬 MovieBot
 
-Temukan film favoritmu dengan chatbot berbasis FSM.
+Temukan film favoritmu dengan chatbot rekomendasi film.
 
 🤖 Chatbot Film  
 🎭 Rekomendasi Genre  
@@ -87,9 +81,7 @@ with col2:
             "pages/chatbot.py"
         )
 
-# ==========================
-# NAVIGATION
-# ==========================
+# navigation
 
 st.markdown("---")
 
@@ -119,9 +111,7 @@ with c3:
     ):
         st.switch_page("pages/about.py")
 
-# ==========================
-# METRICS
-# ==========================
+# statistics
 
 st.header(
     "📊 Statistik",
@@ -145,9 +135,7 @@ c3.metric(
     movies["rating"].max()
 )
 
-# ==========================
-# GENRE POPULER
-# ==========================
+# genre populer
 
 st.header(
     "🔥 Trending Movies",
@@ -248,9 +236,8 @@ for col, genre in zip(
             genre,
             width="stretch"
         )
-# ==========================
-# FITUR
-# ==========================
+
+# fitur
 
 st.markdown("## ✨ Fitur Utama")
 
@@ -268,9 +255,7 @@ with f2:
     st.success("🔍 Regex Intent Recognition")
     st.success("💬 Context Memory")
 
-# ==========================
-# FOOTER
-# ==========================
+# footer
 
 st.markdown("---")
 
