@@ -1,381 +1,311 @@
-from enum import Enum, auto
 import random
+
 from chatbot.intent import IntentRecognizer
 from chatbot.movie_engine import MovieEngine
 
-class State(Enum):
-    START = auto()
-    MAIN_MENU = auto()
-    RECOMMENDATION = auto()
-    DETAIL = auto()
 
 class MovieFSM:
+
     def __init__(self):
-        self.state = State.START
-        self.movie_engine = MovieEngine()
-        self.intent_recognizer = IntentRecognizer()
-        # Menyimpan hasil rekomendasi terakhir
+
+        self.intent = IntentRecognizer()
+
+        self.engine = MovieEngine()
+
+        self.state = "MAIN_MENU"
+
         self.last_movies = []
 
-        # Film yang sedang dibahas
         self.current_movie = None
 
-    # ==========================
-    # RESPONSE HELPERS
-    # ==========================
+        self.current_genre = None
 
-    def text_response(self, message):
+    # response builders
+
+    def text_response(
+        self,
+        message
+    ):
+
         return {
             "type": "text",
-            "data": message
+            "message": message
         }
 
-    def movie_response(self, movie):
+    def movie_response(
+        self,
+        message,
+        movies
+    ):
+
         return {
             "type": "movie",
-            "data": movie
+            "message": message,
+            "movies": movies
         }
-    def natural_movie_comment(self, movie):
 
-        rating = float(movie["rating"])
+    # process
 
-        if rating >= 8.5:
-            return (
-                "🔥 Film ini sangat direkomendasikan dan menjadi salah satu favorit penonton."
+    def process(
+        self,
+        user_text
+    ):
+
+        intent, value = (
+            self.intent.recognize(
+                user_text
             )
-
-        elif rating >= 7:
-            return (
-                "🍿 Film ini cukup populer dan layak masuk daftar tontonan Anda."
-            )
-
-        return (
-            "🎥 Film ini bisa menjadi pilihan menarik untuk dicoba."
-    )
-
-    # ==========================
-    # MAIN PROCESS
-    # ==========================
-
-    def process(self, text):
-        intent, entity = (
-            self.intent_recognizer.recognize(text)
         )
 
-        # ==========================
-        # START
-        # ==========================
+        # greating
 
-        if self.state == State.START:
-            if intent == "greeting":
-                self.state = State.MAIN_MENU
+        if intent == "greeting":
+
             greetings = [
 
-    "👋 Halo! Saya MovieBot. Film apa yang ingin Anda cari hari ini?",
+                "Halo 👋 Saya MovieBot. Lagi ingin nonton film apa hari ini?",
 
-    "🎬 Hai! Saya siap membantu menemukan film yang cocok untuk Anda.",
+                "Hai 🎬 Saya siap membantu mencarikan film yang cocok untukmu.",
 
-    "🍿 Halo! Sebutkan genre favorit Anda, dan saya akan memberikan rekomendasi."
-]
-
-            return self.text_response(
-                random.choice(greetings)
-            )
-        
-        # ==================================
-        # FOLLOW UP CONVERSATION
-        # ==================================
-
-        if intent == "thanks":
+                "Hello 🍿 Mau cari rekomendasi film?"
+            ]
 
             return self.text_response(
-                random.choice([
-                    "Sama-sama 😊",
-                    "Dengan senang hati 🍿",
-                    "Semoga rekomendasinya membantu 🎬"
-                ])
+                random.choice(
+                    greetings
+                )
             )
 
-        if intent == "rating_question":
+        # thanks
 
-            if self.current_movie:
+        elif intent == "thanks":
+
+            return self.text_response(
+                "Sama-sama 😊 Semoga menemukan film yang seru untuk ditonton."
+            )
+
+        # top movues
+
+        elif intent == "top_movies":
+
+            movies = (
+                self.engine
+                .get_top_rated_movies()
+            )
+
+            self.last_movies = movies
+
+            return self.movie_response(
+                "🏆 Film dengan rating tertinggi:",
+                movies
+            )
+
+        # random movie
+
+        elif intent == "random_movie":
+
+            movies = (
+                self.engine
+                .get_all_movies()
+            )
+
+            movie = (
+                random.choice(
+                    movies
+                )
+            )
+
+            self.current_movie = movie
+
+            return self.movie_response(
+                "🎲 Coba film ini:",
+                [movie]
+            )
+
+        # recommendation
+
+        elif intent == "recommendation":
+
+            movies = (
+                self.engine
+                .get_movies_by_genre(
+                    value
+                )
+            )
+
+            if len(movies) == 0:
 
                 return self.text_response(
-                    f"⭐ Film **{self.current_movie['title']}** memiliki rating **{self.current_movie['rating']}**."
+                    f"Maaf, saya belum menemukan film genre {value}"
                 )
 
-            return self.text_response(
-                "Film apa yang ingin Anda tanyakan?"
+            self.current_genre = value
+
+            self.last_movies = movies
+
+            return self.movie_response(
+                f"🎬 Berikut rekomendasi film genre {value}:",
+                movies
             )
 
-        if intent == "genre_question":
 
-            if self.current_movie:
+        # movie number
 
-                return self.text_response(
-                    f"🎭 Film **{self.current_movie['title']}** termasuk genre **{self.current_movie['genre']}**."
-                )
+        elif intent == "movie_number":
 
-            return self.text_response(
-                "Silakan pilih film terlebih dahulu."
-            )
-
-        if intent == "year_question":
-
-            if self.current_movie:
+            if not self.last_movies:
 
                 return self.text_response(
-                    f"📅 Film **{self.current_movie['title']}** dirilis pada tahun **{self.current_movie['year']}**."
+                    "Belum ada daftar film yang dipilih."
                 )
 
-            return self.text_response(
-                "Silakan pilih film terlebih dahulu."
-            )
-
-        if intent == "similar_movie":
-
-            if self.current_movie:
-
-                similar_movies = (
-                    self.movie_engine.get_similar_movies(
-                        self.current_movie["genre"],
-                        self.current_movie["title"]
-                    )
-                )
-
-                result = (
-                    f"🎬 Jika Anda menyukai **{self.current_movie['title']}**, saya juga merekomendasikan:\n\n"
-                )
-
-                for idx, (_, row) in enumerate(
-                    similar_movies.iterrows(),
-                    start=1
-                ):
-
-                    result += (
-                        f"{idx}. {row['title']} ⭐ {row['rating']}\n"
-                    )
-
-                return self.text_response(
-                    result
-                )
-
-            return self.text_response(
-                "Silakan pilih film terlebih dahulu."
-            )
-        # ==========================
-        # MAIN MENU
-        # ==========================
-
-        if self.state == State.MAIN_MENU:
-            # ----------------------
-            # RECOMMENDATION
-            # ----------------------
-
-            if intent == "recommendation":
-                if not entity:
-                    return self.text_response(
-                        "Sebutkan genre, misalnya:\n\nrekomendasi film action"
-                    )
-
-                movies = (
-                    self.movie_engine
-                    .get_movies_by_genre(entity)
-                )
-
-                if len(movies) == 0:
-                    return self.text_response(
-                        "Genre tidak ditemukan."
-                    )
-
-                self.last_movies = []
-                result = (
-                     f"🎬 Saya menemukan beberapa film genre **{entity.title()}** yang mungkin Anda sukai:\n\n"
-                )
-
-                for index, (_, row) in enumerate(
-                    movies.iterrows(),
-                    start=1
-                ):
-                    self.last_movies.append(
-                        row["title"]
-                    )
-                    result += (
-                        f"{index}. "
-                        f"{row['title']} "
-                        f"(⭐ {row['rating']})\n"
-                    )
-
-                result += """
-### Pilih Film
-
-* film 1
-* film 2
-* film 3
-
-atau
-
-* detail nama_film
-"""
-                self.state = (
-                    State.RECOMMENDATION
-                )
-                return self.text_response(
-                    result
-                )
-
-            # ----------------------
-            # DETAIL FILM
-            # ----------------------
+            index = value - 1
 
             if (
-                intent == "detail"
-                and isinstance(entity, str)
+                index < 0
+                or index >= len(
+                    self.last_movies
+                )
             ):
-                movie = (
-                    self.movie_engine
-                    .get_movie(entity)
+
+                return self.text_response(
+                    "Nomor film tidak tersedia."
                 )
 
-                if movie is None:
-                    return self.text_response(
-                        "Film tidak ditemukan."
-                    )
+            movie = (
+                self.last_movies[
+                    index
+                ]
+            )
 
-                self.state = State.DETAIL
-                movie["comment"] = (
-                    self.natural_movie_comment(movie)(
-                        movie
-                    )
+            self.current_movie = movie
+
+            return self.movie_response(
+                "🎥 Detail film:",
+                [movie]
+            )
+
+        # detail
+
+        elif intent == "detail":
+
+            movie = (
+                self.engine
+                .find_best_match(
+                    value
                 )
-                self.current_movie = movie
+            )
 
-                return self.movie_response(
-                    movie
-                )
+            if movie is None:
 
-            return self.text_response("""Saya bisa membantu:
-
-* rekomendasi film action
-* rekomendasi film sci-fi
-* detail interstellar
-""")
-
-        # ==========================
-        # RECOMMENDATION STATE
-        # ==========================
-
-        if self.state == State.RECOMMENDATION:
-            # film 1
-            # film 2
-
-            if intent == "movie_number":
-                if not self.last_movies:
-                    return self.text_response(
-                        "Belum ada rekomendasi film."
-                    )
-
-                idx = entity - 1
-
-                if (
-                    idx < 0
-                    or idx >= len(self.last_movies)
-                ):
-                    return self.text_response(
-                        "Nomor film tidak valid."
-                    )
-
-                movie = (
-                    self.movie_engine
-                    .get_movie(
-                        self.last_movies[idx]
-                    )
+                return self.text_response(
+                    "Film tidak ditemukan."
                 )
 
-                if movie is None:
-                    return self.text_response(
-                        "Film tidak ditemukan."
-                    )
+            self.current_movie = movie
 
-                self.state = State.DETAIL
-                movie["comment"] = (
-                    self.natural_movie_comment(movie)
-                )
-                self.current_movie = movie
-                return self.movie_response(
-                    movie
-                )
+            return self.movie_response(
+                "🎥 Saya menemukan film ini:",
+                [movie]
+            )
 
-            # detail interstellar
+        # rating
 
-            if (
-                intent == "detail"
-                and isinstance(entity, str)
-            ):
-                movie = (
-                    self.movie_engine
-                    .get_movie(entity)
+        elif intent == "rating_question":
+
+            if not self.current_movie:
+
+                return self.text_response(
+                    "Pilih film terlebih dahulu."
                 )
 
-                if movie is None:
-                    return self.text_response(
-                        "Film tidak ditemukan."
-                    )
+            return self.text_response(
+                f"⭐ Rating {self.current_movie['title']} adalah {self.current_movie['rating']}/10"
+            )
 
-                self.state = State.DETAIL
-                movie["comment"] = (
-                    self.natural_movie_comment(movie)
-                )
-                self.current_movie = movie
-                return self.movie_response(
-                    movie
-                )
 
-            return self.text_response("""Silakan pilih film:
+        # genre
 
-* film 1
-* film 2
-* film 3
+        elif intent == "genre_question":
 
-atau
+            if not self.current_movie:
 
-* detail nama_film
-""")
-
-        # ==========================
-        # DETAIL STATE
-        # ==========================
-
-        if self.state == State.DETAIL:
-            if intent == "recommendation":
-                self.state = State.MAIN_MENU
-                return self.process(text)
-
-            if (
-                intent == "detail"
-                and isinstance(entity, str)
-            ):
-                movie = (
-                    self.movie_engine
-                    .get_movie(entity)
+                return self.text_response(
+                    "Pilih film terlebih dahulu."
                 )
 
-                if movie:
-                    movie["comment"] = (
-                        self.natural_movie_comment(movie)
-                    )
-                    self.current_movie = movie
-                    return self.movie_response(
-                        movie
-                    )
+            return self.text_response(
+                f"🎭 Genre film ini adalah {self.current_movie.get('genre','Tidak diketahui')}"
+            )
 
-            return self.text_response("""💬 Perintah yang tersedia
+        # year
 
-* rekomendasi film action
-* rekomendasi film drama
-* detail inception
-""")
+        elif intent == "year_question":
+
+            if not self.current_movie:
+
+                return self.text_response(
+                    "Pilih film terlebih dahulu."
+                )
+
+            return self.text_response(
+                f"📅 Film ini dirilis pada tahun {self.current_movie.get('year','Tidak diketahui')}"
+            )
+
+        # similar movies
+
+        elif intent == "similar_movie":
+
+            if not self.current_movie:
+
+                return self.text_response(
+                    "Pilih film terlebih dahulu."
+                )
+
+            genre = (
+                self.current_movie[
+                    "genre"
+                ]
+            )
+
+            movies = (
+                self.engine
+                .get_movies_by_genre(
+                    genre
+                )
+            )
+
+            self.last_movies = movies
+
+            return self.movie_response(
+                "🎬 Kalau kamu suka film itu, mungkin kamu juga suka:",
+                movies
+            )
+
+        # back
+
+        elif intent == "back":
+
+            self.state = "MAIN_MENU"
+
+            return self.text_response(
+                "🏠 Kembali ke menu utama. Kamu bisa meminta rekomendasi film atau mencari judul film."
+            )
+
+        # unknown
 
         return self.text_response(
-            "Maaf, saya tidak memahami perintah tersebut."
+            """
+            Maaf, saya belum memahami maksudmu 😅
+
+            Coba salah satu contoh berikut:
+
+            • rekomendasi film horror
+            • film terbaik
+            • film populer
+            • cari film interstellar
+            • film 1
+            • yang mirip
+            • surprise me
+         """
         )
