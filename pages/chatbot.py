@@ -3,151 +3,424 @@ import streamlit as st
 
 from chatbot.fsm import MovieFSM
 
+# page configuration
+
 st.set_page_config(
     page_title="MovieBot Chat",
     page_icon="🎬",
     layout="wide",
 )
 
-# ==========================
-# HELPER RENDER
-# ==========================
+# function to render chatbot response
 
-def render_message(content):
+def render_message(
+    content,
+    msg_index
+):
+
+    # text response
+
     if content["type"] == "text":
-        st.markdown(content["data"])
+
+        st.markdown(
+            content["message"]
+        )
+
+    # movie response
 
     elif content["type"] == "movie":
-        movie = content["data"]
-        with st.container():
-            col1, col2 = st.columns([1, 2])
-            with col1:
-                if "poster" in movie and movie["poster"]:
-                    st.image(
-                    movie["poster"],
-                    width="stretch"
-                )
-            with col2:
-                st.subheader(movie["title"])
-                st.write(f"🎭 Genre: {movie.get('genre','-')}")
-                st.write(f"📅 Tahun: {movie.get('year','-')}")
-                st.write(f"⭐ Rating: {movie.get('rating','-')}")
 
-                if "overview" in movie and movie["overview"]:
-                    st.markdown("### 📖 Sinopsis")
-                    st.write(movie["overview"])
+        st.markdown(
+            content["message"]
+        )
+
+        movies = content["movies"]
+
+        for idx, movie in enumerate(
+            movies,
+            start=1
+        ):
+
+            with st.container():
 
                 st.divider()
 
-                col_a, col_b = st.columns(2)
-                with col_a:
-                    if st.button("🎬 Film Serupa", key=f"similar_{movie['title']}", use_container_width=True):
-                        response = st.session_state.fsm.process("film serupa")
-                        st.session_state.messages.append({"role": "assistant", "content": response})
-                        st.rerun()
+                col1, col2 = st.columns(
+                    [1, 2]
+                )
 
-                with col_b:
-                    if st.button("⭐ Rating", key=f"rating_{movie['title']}", use_container_width=True):
-                        response = st.session_state.fsm.process("ratingnya berapa")
-                        st.session_state.messages.append({"role": "assistant", "content": response})
-                        st.rerun()
+                # poster
 
-                col_c, col_d = st.columns(2)
-                with col_c:
-                    if st.button("🎭 Genre", key=f"genre_{movie['title']}", use_container_width=True):
-                        response = st.session_state.fsm.process("genrenya apa")
-                        st.session_state.messages.append({"role": "assistant", "content": response})
-                        st.rerun()
+                with col1:
 
-                with col_d:
-                    if st.button("📅 Tahun", key=f"year_{movie['title']}", use_container_width=True):
-                        response = st.session_state.fsm.process("tahun berapa")
-                        st.session_state.messages.append({"role": "assistant", "content": response})
-                        st.rerun()
+                    poster = (
+                        movie.get(
+                            "poster_url"
+                        )
+                        or
+                        movie.get(
+                            "poster"
+                        )
+                    )
+
+                    if poster:
+
+                        st.image(
+                            poster,
+                            use_container_width="stretch"
+                        )
+
+                # details
+
+                with col2:
+
+                    st.subheader(
+                        f"{idx}. {movie.get('title','-')}"
+                    )
+
+                    if movie.get(
+                        "genre"
+                    ):
+
+                        st.write(
+                            f"🎭 Genre: {movie['genre']}"
+                        )
+
+                    if movie.get(
+                        "year"
+                    ):
+
+                        st.write(
+                            f"📅 Tahun: {movie['year']}"
+                        )
+
+                    if movie.get(
+                        "rating"
+                    ):
+
+                        st.write(
+                            f"⭐ Rating: {movie['rating']}"
+                        )
+
+                    if movie.get(
+                        "overview"
+                    ):
+
+                        with st.expander(
+                            "📖 Sinopsis"
+                        ):
+
+                            st.write(
+                                movie[
+                                    "overview"
+                                ]
+                            )
+
+                    st.divider()
+
+                    # action buttons
+
+                    btn1, btn2 = st.columns(
+                        2
+                    )
+
+                    with btn1:
+
+                        if st.button(
+                            "🎬 Detail",
+                            key=f"detail_{msg_index}_{idx}_{movie['title']}"
+                        ):
+
+                            response = (
+                                st.session_state
+                                .fsm
+                                .process(
+                                    f"detail {movie['title']}"
+                                )
+                            )
+
+                            st.session_state.messages.append(
+                                {
+                                    "role": "assistant",
+                                    "content": response
+                                }
+                            )
+
+                            st.rerun()
+
+                    with btn2:
+
+                        if st.button(
+                            "🎯 Pilih Film",
+                            key=f"select_{msg_index}_{idx}_{movie['title']}"
+                        ):
+
+                            response = (
+                                st.session_state
+                                .fsm
+                                .process(
+                                    f"film {idx}"
+                                )
+                            )
+
+                            st.session_state.messages.append(
+                                {
+                                    "role": "assistant",
+                                    "content": response
+                                }
+                            )
+
+                            st.rerun()
+
+                    btn3, btn4 = st.columns(
+                        2
+                    )
+
+                    with btn3:
+
+                        if st.button(
+                            "⭐ Rating",
+                            key=f"rating_{msg_index}_{idx}_{movie['title']}"
+                        ):
+
+                            response = (
+                                st.session_state
+                                .fsm
+                                .process(
+                                    "ratingnya berapa"
+                                )
+                            )
+
+                            st.session_state.messages.append(
+                                {
+                                    "role": "assistant",
+                                    "content": response
+                                }
+                            )
+
+                            st.rerun()
+
+                    with btn4:
+
+                        if st.button(
+                            "🎭 Genre",
+                            key=f"genre_{msg_index}_{idx}_{movie['title']}"
+                        ):
+
+                            response = (
+                                st.session_state
+                                .fsm
+                                .process(
+                                    "genrenya apa"
+                                )
+                            )
+
+                            st.session_state.messages.append(
+                                {
+                                    "role": "assistant",
+                                    "content": response
+                                }
+                            )
+
+                            st.rerun()
+
+                    btn5, btn6 = st.columns(
+                        2
+                    )
+
+                    with btn5:
+
+                        if st.button(
+                            "📅 Tahun",
+                            key=f"year_{msg_index}_{idx}_{movie['title']}"
+                        ):
+
+                            response = (
+                                st.session_state
+                                .fsm
+                                .process(
+                                    "tahun berapa"
+                                )
+                            )
+
+                            st.session_state.messages.append(
+                                {
+                                    "role": "assistant",
+                                    "content": response
+                                }
+                            )
+
+                            st.rerun()
+
+                    with btn6:
+
+                        if st.button(
+                            "🎥 Film Serupa",
+                            key=f"similar_{msg_index}_{idx}_{movie['title']}"
+                        ):
+
+                            response = (
+                                st.session_state
+                                .fsm
+                                .process(
+                                    "film serupa"
+                                )
+                            )
+
+                            st.session_state.messages.append(
+                                {
+                                    "role": "assistant",
+                                    "content": response
+                                }
+                            )
+
+                            st.rerun()
 
 
-# ==========================
-# HEADER
-# ==========================
 
-st.header("🤖 MovieBot", divider="rainbow")
+# header
 
-top1, top2 = st.columns([8, 1])
+st.header(
+    "🎬 MovieBot",
+    divider="rainbow"
+)
+
+top1, top2 = st.columns(
+    [8, 1]
+)
+
 with top2:
-    if st.button("🏠", use_container_width=True):
-        st.switch_page("app.py")
 
+    if st.button(
+        "🏠",
+        use_container_width="stretch"
+    ):
 
-# ==========================
-# SESSION STATE
-# ==========================
+        st.switch_page(
+            "app.py"
+        )
+
+# initialize FSM and messages
 
 if "fsm" not in st.session_state:
-    st.session_state.fsm = MovieFSM()
+
+    st.session_state.fsm = (
+        MovieFSM()
+    )
 
 if "messages" not in st.session_state:
+
     st.session_state.messages = [
+
         {
             "role": "assistant",
+
             "content": {
+
                 "type": "text",
-                "data": """# 🍿 Selamat Datang di MovieBot
 
-Saya dapat membantu Anda menemukan film yang menarik.
+                "message": """
+            # 🍿 Selamat Datang di MovieBot
 
-### Contoh
+            Saya dapat membantu menemukan film yang menarik.
 
-🎬 rekomendasi film action
+            ### Contoh
 
-🎬 rekomendasi film sci-fi
+            🎬 rekomendasi film horror
 
-📖 detail interstellar
+            🎬 rekomendasi film action
 
-### Anda juga bisa bertanya
+            🎬 rekomendasi film drama
 
-⭐ ratingnya berapa?
+            🎲 surprise me
 
-🎭 genrenya apa?
+            🏆 film terbaik
 
-📅 tahun berapa?
+            📖 detail interstellar
 
-🎬 film serupa
-""",
-            },
+            ### Follow Up
+
+            ⭐ ratingnya berapa
+
+            🎭 genrenya apa
+
+            📅 tahun berapa
+
+            🎥 film serupa
+            """
+            }
         }
     ]
 
 
-# ==========================
-# CHAT HISTORY
-# ==========================
-
-for message in st.session_state.messages:
-    with st.chat_message(message["role"]):
-        render_message(message["content"])
+# chat history
 
 
-# ==========================
-# INPUT
-# ==========================
+for msg_index, message in enumerate(
+    st.session_state.messages
+):
 
-prompt = st.chat_input("Tanyakan film favoritmu...")
+    with st.chat_message(
+        message["role"]
+    ):
+
+        render_message(
+            message["content"],
+            msg_index
+        )
+
+# chat input
+
+prompt = st.chat_input(
+    "Tanyakan film favoritmu..."
+)
 
 if prompt:
-    st.session_state.messages.append({
-        "role": "user",
-        "content": {"type": "text", "data": prompt},
-    })
+
+    st.session_state.messages.append(
+
+        {
+            "role": "user",
+
+            "content": {
+
+                "type": "text",
+
+                "message": prompt
+            }
+        }
+    )
 
     loading_text = random.choice([
+
         "🎬 Mencari film terbaik...",
+
         "🍿 Menyiapkan rekomendasi...",
+
         "🔍 Menelusuri database film...",
-        "⭐ Memilih film yang cocok...",
+
+        "⭐ Memilih film yang cocok..."
     ])
 
-    with st.spinner(loading_text):
-        response = st.session_state.fsm.process(prompt)
+    with st.spinner(
+        loading_text
+    ):
 
-    st.session_state.messages.append({"role": "assistant", "content": response})
+        response = (
+            st.session_state
+            .fsm
+            .process(
+                prompt
+            )
+        )
+
+    st.session_state.messages.append(
+
+        {
+            "role": "assistant",
+
+            "content": response
+        }
+    )
+
     st.rerun()
