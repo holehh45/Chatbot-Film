@@ -1,215 +1,236 @@
-
 import re
 
 
 class IntentRecognizer:
-	def recognize(self, text):
-		text = text.lower().strip()
 
-		# ======================
-		# GREETING
-		# ======================
+    GENRE_MAP = {
 
-		if re.search(
-			r"\b(halo|hai|hello|hi)\b",
-			text
-		):
-			return (
-				"greeting",
-				None
-			)
+        "aksi": "action",
+        "action": "action",
 
-		# ======================
-		# THANKS
-		# ======================
+        "komedi": "comedy",
+        "comedy": "comedy",
+        "lucu": "comedy",
 
-		if re.search(
-			r"(terima kasih|makasih|thanks)",
-			text
-		):
-			return (
-				"thanks",
-				None
-			)
+        "drama": "drama",
 
-		# ======================
-		# FOLLOW UP QUESTIONS
-		# ======================
+        "horor": "horror",
+        "horror": "horror",
 
-		if re.search(
-			r"(ratingnya|berapa rating)",
-			text
-		):
-			return (
-				"rating_question",
-				None
-			)
+        "romantis": "romance",
+        "romance": "romance",
 
-		if re.search(
-			r"(genrenya|genre apa)",
-			text
-		):
-			return (
-				"genre_question",
-				None
-			)
+        "animasi": "animation",
+        "animation": "animation",
+        "kartun": "animation",
 
-		if re.search(
-			r"(tahun berapa|kapan rilis|rilis kapan)",
-			text
-		):
-			return (
-				"year_question",
-				None
-			)
+        "sci-fi": "sci-fi",
+        "scifi": "sci-fi",
+        "fiksi ilmiah": "sci-fi"
+    }
 
-		if re.search(
-			r"(film serupa|film mirip|mirip|rekomendasi serupa)",
-			text
-		):
-			return (
-				"similar_movie",
-				None
-			)
+    ORDINAL_MAP = {
 
-		# ======================
-		# MOVIE NUMBER
-		# film 1
-		# nomor 2
-		# ======================
+        "pertama": 1,
+        "kedua": 2,
+        "ketiga": 3,
+        "keempat": 4,
+        "kelima": 5,
+        "keenam": 6,
+        "ketujuh": 7,
+        "kedelapan": 8,
+        "kesembilan": 9,
+        "kesepuluh": 10
+    }
 
-		number_match = re.search(
-			r"(film|nomor)\s*(\d+)",
-			text
-		)
+    def recognize(self, text):
 
-		if number_match:
+        text = text.lower().strip()
 
-			number = int(
-				number_match.group(2)
-			)
+        # greeting
 
-			return (
-				"movie_number",
-				number
-			)
+        if re.search(
+            r"\b(halo|hai|hello|hi|pagi|siang|sore|malam)\b",
+            text
+        ):
 
-		# ======================
-		# YANG PERTAMA
-		# ======================
+            return (
+                "greeting",
+                None
+            )
 
-		if "yang pertama" in text:
-			return (
-				"movie_number",
-				1
-			)
+        # thanks
 
-		if "yang kedua" in text:
-			return (
-				"movie_number",
-				2
-			)
+        if re.search(
+            r"(terima kasih|makasih|thanks|thank you)",
+            text
+        ):
 
-		if "yang ketiga" in text:
-			return (
-				"movie_number",
-				3
-			)
+            return (
+                "thanks",
+                None
+            )
 
-		if "yang keempat" in text:
-			return (
-				"movie_number",
-				4
-			)
+        # kembali
 
-		# ======================
-		# RECOMMENDATION
-		# ======================
+        if re.search(
+            r"(menu|kembali|home|awal)",
+            text
+        ):
 
-		genre_match = re.search(
-			r"(action|sci-fi|animation|drama|comedy|horror|romance)",
-			text
-		)
+            return (
+                "back",
+                None
+            )
 
-		if genre_match:
+        # folw up
 
-			genre = genre_match.group(1)
+        if re.search(
+            r"(ratingnya|berapa rating)",
+            text
+        ):
 
-			if re.search(
-				r"(rekomendasi|sarankan|film bagus|ingin film|suka genre|film genre)",
-				text
-			):
+            return (
+                "rating_question",
+                None
+            )
 
-				return (
-					"recommendation",
-					genre
-				)
+        if re.search(
+            r"(genre apa|genrenya)",
+            text
+        ):
 
-		# ======================
-		# DETAIL
-		# detail interstellar
-		# info titanic
-		# ======================
+            return (
+                "genre_question",
+                None
+            )
 
-		detail_match = re.search(
-			r"(detail|info|informasi)\s+(.+)",
-			text
-		)
+        if re.search(
+            r"(tahun berapa|kapan rilis|rilis kapan)",
+            text
+        ):
 
-		if detail_match:
+            return (
+                "year_question",
+                None
+            )
 
-			title = (
-				detail_match.group(2)
-				.strip()
-			)
+        if re.search(
+            r"(film serupa|film mirip|mirip dengan itu|yang mirip|sejenis|rekomendasi serupa)",
+            text
+        ):
 
-			return (
-				"detail",
-				title
-			)
+            return (
+                "similar_movie",
+                None
+            )
 
-		# ======================
-		# SEARCH
-		# cari film titanic
-		# ======================
+        # top movie
 
-		search_match = re.search(
-			r"cari film\s+(.+)",
-			text
-		)
+        if re.search(
+            r"(film terbaik|rating tertinggi|film populer|film terkenal|top movie|top film)",
+            text
+        ):
 
-		if search_match:
+            return (
+                "top_movies",
+                None
+            )
 
-			title = (
-				search_match.group(1)
-				.strip()
-			)
+        # film random
 
-			return (
-				"detail",
-				title
-			)
+        if re.search(
+            r"(bebas|acak|surprise me|apa saja|terserah)",
+            text
+        ):
 
-		# ======================
-		# BACK
-		# ======================
+            return (
+                "random_movie",
+                None
+            )
 
-		if re.search(
-			r"(menu|kembali|home)",
-			text
-		):
-			return (
-				"back",
-				None
-			)
+        # nomer film
+        
+        number_match = re.search(
+            r"(film|nomor)\s*(\d+)",
+            text
+        )
 
-		# ======================
-		# UNKNOWN
-		# ======================
+        if number_match:
 
-		return (
-			"unknown",
-			None
-		)
+            return (
+                "movie_number",
+                int(number_match.group(2))
+            )
 
+        for word, number in self.ORDINAL_MAP.items():
 
+            if f"yang {word}" in text:
+
+                return (
+                    "movie_number",
+                    number
+                )
+
+        # detail
+
+        detail_match = re.search(
+            r"(detail|info|informasi)\s+(.+)",
+            text
+        )
+
+        if detail_match:
+
+            return (
+                "detail",
+                detail_match.group(2).strip()
+            )
+        
+        # search film
+
+        search_match = re.search(
+            r"(cari film|search film)\s+(.+)",
+            text
+        )
+
+        if search_match:
+
+            return (
+                "detail",
+                search_match.group(2).strip()
+            )
+
+        # rekomendasi
+
+        for keyword, genre in self.GENRE_MAP.items():
+
+            if keyword in text:
+
+                if re.search(
+                    r"(rekomendasi|sarankan|film bagus|ingin film|suka genre|film genre|film|nonton|tontonan|film seru|ada film)",
+                    text
+                ):
+
+                    return (
+                        "recommendation",
+                        genre
+                    )
+
+        # Judul pendek
+
+        words = text.split()
+
+        if (
+            len(words) <= 5
+            and not re.search(r"\d+", text)
+        ):
+
+            return (
+                "detail",
+                text
+            )
+
+        return (
+            "unknown",
+            None
+        )
