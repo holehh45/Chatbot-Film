@@ -1,6 +1,50 @@
 title,genre,year,rating,poster,overview
+
 Interstellar,Sci-Fi,2014,8.7,https://image.tmdb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg,"Sekelompok astronaut melakukan perjalanan melalui wormhole untuk mencari planet baru bagi umat manusia."
 Inception,Sci-Fi,2010,8.8,https://image.tmdb.org/t/p/w500/9gk7adHYeDvHkCSEqAvQNLV5Uge.jpg,"Seorang pencuri memasuki mimpi orang lain untuk mencuri informasi rahasia."
+
 John Wick,Action,2014,7.4,https://image.tmdb.org/t/p/w500/fZPSd91yGE9fCcCe6OoQr6E3Bev.jpg,"Mantan pembunuh bayaran kembali beraksi untuk membalas dendam."
 The Dark Knight,Action,2008,9.0,https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg,"Batman menghadapi musuh paling berbahaya, Joker."
+
 The Shawshank Redemption,Drama,1994,9.3,https://image.tmdb.org/t/p/w500/q6y0Go1tsGEsmtFryDOJo3dEmqu.jpg,"Dua tahanan membentuk persahabatan yang kuat selama bertahun-tahun di penjara."
+
+The Godfather,Crime,1972,9.2,https://www.themoviedb.org/t/p/w1280/3bhkrj58Vtu7enYsRolD1fZdja1.jpg,"Kisah keluarga mafia Corleone yang kuat dan penuh intrik."
+
+The Matrix,Sci-Fi,1999,8.7,https://www.themoviedb.org/t/p/w1280/dXNAPwY7VrqMAo51EKhhCJfaGb5.jpg,"Seorang hacker menemukan bahwa dunia yang dia kenal hanyalah simulasi komputer."
+
+Pulp Fiction,Crime,1994,8.9,https://www.themoviedb.org/t/p/w1280/vQWk5YBFWF4bZaofAbv0tShwBvQ.jpg,"Kisah yang saling terkait tentang kejahatan di Los Angeles."
+
+Fight Club,Drama,1999,8.8,https://www.themoviedb.org/t/p/w1280/yrOE92bDvzClGDpsDu8JkUssuuA.jpg,"Seorang pria yang bosan dengan hidupnya membentuk klub pertarungan bawah tanah."
+Forrest Gump,Drama,1994,8.8,https://image.tmdb.org/t/p/w500/saHP97rTPS5eLmrLQEcANmKrsFl.jpg,"Kisah hidup Forrest Gump yang luar biasa dan penuh inspirasi."
+
+The Conjuring,Horror,2013,7.5,https://www.themoviedb.org/t/p/w1280/byWgphT74ClOVa8EOGzYDkl8DVL.jpg,"Pasangan penyelidik paranormal membantu keluarga yang diteror kekuatan jahat di rumah mereka."
+Insidious,Horror,2010,6.8,https://www.themoviedb.org/t/p/w1280/1egpmVXuXed58TH2UOnX1nATTrf.jpg,"Seorang anak terjebak dalam dunia roh dan keluarganya harus menyelamatkannya."
+Annabelle,Horror,2014,5.4,https://www.themoviedb.org/t/p/w1280/yLsuU2P2SpDYFwtZQ7dtfVAf6TE.jpg,"Boneka misterius membawa teror ke sebuah keluarga muda."
+
+Titanic,Romance,1997,7.9,https://image.tmdb.org/t/p/w500/9xjZS2rlVxm8SFx8kPC3aIGCOYQ.jpg,"Kisah cinta antara Jack dan Rose di atas kapal Titanic."
+The Notebook,Romance,2004,7.8,https://image.tmdb.org/t/p/w500/rNzQyW4f8B8cQeg7Dgj3n6eT5k9.jpg,"Kisah cinta yang bertahan melawan waktu dan perbedaan sosial."
+Me Before You,Romance,2016,7.4,https://image.tmdb.org/t/p/w500/Ia3dzj5LnCj1ZBdlVeJrbKJQxG.jpg,"Seorang wanita muda merawat pria yang lumpuh dan menemukan cinta."
+
+Toy Story,Animation,1995,8.3,https://image.tmdb.org/t/p/w500/uXDfjJbdP4ijW5hWSBrPrlKpxab.jpg,"Mainan-mainan hidup ketika manusia tidak melihat mereka."
+Finding Nemo,Animation,2003,8.2,https://image.tmdb.org/t/p/w500/eHuGQ10FUzK1mdOY69wF5pGgEf5.jpg,"Seekor ikan badut mencari anaknya yang hilang."
+Coco,Animation,2017,8.4,https://image.tmdb.org/t/p/w500/gGEsBPAijhVUFoiNpgZXqRVWJt2.jpg,"Seorang anak laki-laki memasuki dunia orang mati untuk menemukan sejarah keluarganya."
+
+The Hangover,Comedy,2009,7.7,https://image.tmdb.org/t/p/w500/uluhlXubGu1VxU63X9VHCLWDAYP.jpg,"Tiga sahabat mencoba mengingat apa yang terjadi saat pesta liar di Las Vegas."
+Free Guy,Comedy,2021,7.1,https://image.tmdb.org/t/p/w500/xmbU4JTUm8rsdtn7Y3Fcm30GpeT.jpg,"Seorang karakter NPC menyadari bahwa dirinya hidup di dalam video game."
+Yes Man,Comedy,2008,6.8,https://image.tmdb.org/t/p/w500/7DyuV2G0hLEqHeueDfOqhZ2DVut.jpg,"Seorang pria memutuskan untuk selalu mengatakan ya pada setiap kesempatan."
+
+Avengers: Endgame,Adventure,2019,8.4,https://image.tmdb.org/t/p/w500/or06FN3Dka5tukK1e9sl16pB3iy.jpg,"Para Avengers berusaha mengembalikan dunia setelah kehancuran besar."
+Jurassic Park,Adventure,1993,8.2,https://image.tmdb.org/t/p/w500/oU7Oq2kFAAlGqbU4VoAE36g4hoI.jpg,"Taman dinosaurus menjadi mimpi buruk ketika para makhluk lepas kendali."
+Pirates of the Caribbean,Adventure,2003,8.1,https://image.tmdb.org/t/p/w500/z8onk7LV9Mmw6zKz4hT6pzzvmvl.jpg,"Kapten Jack Sparrow berpetualang mencari harta karun dan kebebasan."
+
+Harry Potter and the Sorcerer's Stone,Fantasy,2001,7.6,https://image.tmdb.org/t/p/w500/wuMc08IPKEatf9rnMNXvIDxqP4W.jpg,"Harry Potter menemukan bahwa dirinya adalah seorang penyihir."
+The Lord of the Rings: The Fellowship of the Ring,Fantasy,2001,8.8,https://image.tmdb.org/t/p/w500/6oom5QYQ2yQTMJIbnvbkBL9cHo6.jpg,"Sekelompok pahlawan memulai perjalanan untuk menghancurkan cincin kekuasaan."
+Fantastic Beasts and Where to Find Them,Fantasy,2016,7.2,https://image.tmdb.org/t/p/w500/fLsaFKExQt05yqjoAvKsmOMYvJR.jpg,"Petualangan penyihir Newt Scamander di dunia sihir."
+
+Shutter Island,Mystery,2010,8.2,https://image.tmdb.org/t/p/w500/4GDy0PHYX3VRXUtwK5ysFbg3kEx.jpg,"Seorang detektif menyelidiki hilangnya pasien rumah sakit jiwa."
+Gone Girl,Mystery,2014,8.1,https://image.tmdb.org/t/p/w500/ts996lKsxvjkO2yiYG0ht4qAicO.jpg,"Seorang pria menjadi tersangka utama dalam hilangnya istrinya."
+Knives Out,Mystery,2019,7.9,https://image.tmdb.org/t/p/w500/pThyQovXQrw2m0s9x82twj48Jq4.jpg,"Seorang detektif eksentrik menyelidiki kematian seorang penulis kaya."
+
+Se7en,Thriller,1995,8.6,https://image.tmdb.org/t/p/w500/6yoghtyTpznpBik8EngEmJskVUO.jpg,"Dua detektif memburu pembunuh berantai yang menggunakan tujuh dosa mematikan."
+Prisoners,Thriller,2013,8.1,https://image.tmdb.org/t/p/w500/uhviyknTT5cEQXbn6vWIqfM4vGm.jpg,"Seorang ayah putus asa mencari putrinya yang hilang."
+The Silence of the Lambs,Thriller,1991,8.6,https://image.tmdb.org/t/p/w500/rplLJ2hPcOQmkFhTqUte0MkEaO2.jpg,"Agen FBI muda meminta bantuan seorang pembunuh berantai untuk menangkap pelaku lain."
